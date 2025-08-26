@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Battle City Modern</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="game-container">
+        <!-- Game Title -->
+        <h1 class="title">BATTLE CITY</h1>
+        <p class="subtitle">Modern Multiplayer Edition</p>
+
+        <!-- Start Screen -->
+        <div id="startScreen" class="start-screen">
+            <div class="menu-buttons">
+                <button id="createGameBtn" class="btn primary">Create Game</button>
+                <button id="joinGameBtn" class="btn secondary">Join Game</button>
+            </div>
+
+            <!-- Join Game Form -->
+            <div id="joinForm" class="join-form">
+                <h3>Enter Game PIN:</h3>
+                <input 
+                    type="text" 
+                    id="pinInput" 
+                    class="pin-input" 
+                    placeholder="XXXXX"
+                    maxlength="5"
+                >
+                <br>
+                <button id="connectBtn" class="btn primary">Connect</button>
+                <button id="backBtn" class="btn">Back</button>
+            </div>
+
+            <!-- Connection Status -->
+            <div id="connectionStatus" class="connection-status">
+                <div class="status-text" id="statusText">Connecting...</div>
+                <div class="pin-display" id="pinDisplay"></div>
+                <div class="player-count" id="playerCount">Players: 0/2</div>
+            </div>
+        </div>
+
+        <!-- Game Canvas (hidden initially) -->
+        <canvas 
+            id="gameCanvas" 
+            width="832" 
+            height="832">
+        </canvas>
+
+        <!-- Debug Info -->
+        <div id="debugInfo" style="display: none; margin-top: 20px; color: #666; font-size: 0.8rem;">
+            <p>Connection: <span id="debugConnection">Disconnected</span></p>
+            <p>Room: <span id="debugRoom">None</span></p>
+            <p>Players: <span id="debugPlayers">0</span></p>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="js/spriteManager.js"></script>
+    <script src="js/network.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/game.js"></script>
+    
+    <script>
+        // Initialize the game when page loads
+        document.addEventListener('DOMContentLoaded', async function() {
+            console.log('🎮 Battle City Modern - Client Starting...');
+            
+            try {
+                // Initialize UI
+                UI.init();
+                
+                // Initialize Sprite Manager (load assets)
+                await SpriteManager.init();
+                
+                // Initialize Network (will auto-connect)
+                Network.init();
+                
+                // Initialize Game (canvas setup, etc.)
+                Game.init();
+                
+                console.log('✅ Battle City Modern - Client Ready!');
+            } catch (error) {
+                console.error('❌ Failed to initialize client:', error);
+                UI.showToast('Failed to load game assets. Please refresh the page.', 'error', 10000);
+            }
+        });
+    </script>
+</body>
+</html>
