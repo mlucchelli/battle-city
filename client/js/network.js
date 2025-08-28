@@ -114,6 +114,41 @@ const Network = {
             // Forward to game logic
             Game.onPlayerMove(data);
         });
+
+        // Bullet events
+        this.socket.on('bullet-shot', (data) => {
+            console.log('🔫 Bullet shot received:', data);
+            // Forward to game logic for bullet creation
+            if (Game && Game.onBulletShot) {
+                Game.onBulletShot(data);
+            }
+        });
+
+        this.socket.on('bullet-destroyed', (data) => {
+            console.log('💥 Bullet destroyed received:', data);
+            // Forward to game logic for bullet removal
+            if (Game && Game.onBulletDestroyed) {
+                Game.onBulletDestroyed(data);
+            }
+        });
+
+        // Collision events
+        this.socket.on('bullet-tank-collision', (data) => {
+            console.log('💥 Bullet-Tank collision received:', data);
+            // Forward to game logic for collision handling
+            if (Game && Game.onBulletTankCollision) {
+                Game.onBulletTankCollision(data);
+            }
+        });
+
+        // Respawn events
+        this.socket.on('player-respawn', (data) => {
+            console.log('🔄 Player respawn received:', data);
+            // Forward to game logic for respawn handling
+            if (Game && Game.onPlayerRespawn) {
+                Game.onPlayerRespawn(data);
+            }
+        });
     },
 
     // Game actions
@@ -140,6 +175,76 @@ const Network = {
 
         console.log('🎮 Joining game with PIN:', pin);
         this.socket.emit('join-game', { pin: pin.toUpperCase() });
+    },
+
+    // Send player movement to server
+    sendPlayerMove(direction, delta, playerRole) {
+        if (!this.isConnected || !this.currentRoom) {
+            console.log('❌ Cannot send move: Not connected or not in room');
+            return;
+        }
+
+        this.socket.emit('player-move', {
+            direction: direction,
+            delta: delta,
+            playerRole: playerRole
+        });
+    },
+
+    // Send bullet shoot to server
+    sendBulletShoot(bulletData, playerRole) {
+        if (!this.isConnected || !this.currentRoom) {
+            console.log('❌ Cannot shoot: Not connected or not in room');
+            return;
+        }
+
+        console.log('🔫 Sending bullet shoot to server:', bulletData);
+        this.socket.emit('player-shoot', {
+            bullet: bulletData,
+            playerRole: playerRole
+        });
+    },
+
+    // Send bullet destruction to server (when bullet hits boundary/terrain)
+    sendBulletDestroy(bulletId, playerRole) {
+        if (!this.isConnected || !this.currentRoom) {
+            console.log('❌ Cannot destroy bullet: Not connected or not in room');
+            return;
+        }
+
+        console.log('💥 Sending bullet destroy to server:', bulletId);
+        this.socket.emit('bullet-destroy', {
+            bulletId: bulletId,
+            playerRole: playerRole
+        });
+    },
+
+    // Send bullet-tank collision to server
+    sendBulletTankCollision(bulletId, targetPlayerId, playerRole) {
+        if (!this.isConnected || !this.currentRoom) {
+            console.log('❌ Cannot send collision: Not connected or not in room');
+            return;
+        }
+
+        console.log('💥 Sending bullet-tank collision to server:', { bulletId, targetPlayerId });
+        this.socket.emit('bullet-tank-collision', {
+            bulletId: bulletId,
+            targetPlayerId: targetPlayerId,
+            playerRole: playerRole
+        });
+    },
+
+    // Request player respawn
+    sendPlayerRespawn(playerRole) {
+        if (!this.isConnected || !this.currentRoom) {
+            console.log('❌ Cannot respawn: Not connected or not in room');
+            return;
+        }
+
+        console.log('🔄 Requesting player respawn');
+        this.socket.emit('player-respawn', {
+            playerRole: playerRole
+        });
     },
 
     startGame() {

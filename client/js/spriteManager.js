@@ -24,6 +24,14 @@ const SpriteManager = {
         }
     },
 
+    // Bullet sprite definitions - typically in first rows
+    bulletSprites: {
+        up: 'cell_r0_c8',
+        right: 'cell_r0_c9', 
+        down: 'cell_r0_c10',
+        left: 'cell_r0_c11'
+    },
+
     async init() {
         console.log('🎨 Initializing Sprite Manager...');
         
@@ -143,6 +151,37 @@ const SpriteManager = {
         const spriteName = tankFrames[spriteFrame];
 
         return this.drawSprite(ctx, spriteName, x, y, scale);
+    },
+
+    drawBullet(ctx, direction, x, y, scale = 1) {
+        // Draw bullet as geometric shape since atlas only has 64x64 tank sprites
+        ctx.save();
+        
+        // Set bullet properties
+        ctx.fillStyle = '#FFFF00'; // Yellow color like classic Battle City
+        ctx.strokeStyle = '#FFA500'; // Orange outline
+        ctx.lineWidth = 1;
+        
+        // Draw bullet based on direction
+        const bulletSize = 8 * scale; // Small 8x8 pixel bullet
+        
+        switch(direction) {
+            case 'up':
+            case 'down':
+                // Vertical bullet (taller rectangle)
+                ctx.fillRect(x + 4, y, bulletSize/2, bulletSize);
+                ctx.strokeRect(x + 4, y, bulletSize/2, bulletSize);
+                break;
+            case 'left':
+            case 'right':
+                // Horizontal bullet (wider rectangle)
+                ctx.fillRect(x, y + 4, bulletSize, bulletSize/2);
+                ctx.strokeRect(x, y + 4, bulletSize, bulletSize/2);
+                break;
+        }
+        
+        ctx.restore();
+        return true;
     },
 
     // Utility functions
