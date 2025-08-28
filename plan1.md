@@ -82,4 +82,6 @@
 - Testing continuo después de cada etapa
 - Validación multiplayer real en cada entrega
 
+---
+
 ¿Apruebas este plan de 4 etapas?
